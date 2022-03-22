@@ -1,0 +1,35 @@
+echo "
+    deb http://us.archive.ubuntu.com/ubuntu/ xenial universe
+    deb http://us.archive.ubuntu.com/ubuntu/ xenial-updates universe
+    deb http://us.archive.ubuntu.com/ubuntu/ xenial main restricted
+    deb http://us.archive.ubuntu.com/ubuntu/ xenial-updates main restricted
+    " >> /etc/apt/sources.list
+	
+apt-get install install ntpdate ntp inetutils-traceroute build-essential libnet-ldap-perl libpcre3-dev lwresd libssl1.0-dev libbind-dev libpam0g-dev lwresd
+
+apt-get install realmd libnss-sss libpam-sss sssd sssd-tools adcli samba-common-bin oddjob oddjob-mkhomedir packagekit
+
+apt-get install libpam-google-authenticator
+
+vi /etc/pam.d/sshd
+auth required pam_google_authenticator.so nullok
+auth required pam_permit.so
+
+vi /etc/ssh/sshd_config
+ChallengeResponseAuthentication yes
+
+systemctl restart sshd.service
+
+
+touch /etc/pam.d/tac_plus
+vi /etc/pam.d/tac_plus
+
+auth requisite pam_google_authenticator.so forward_pass
+auth required pam_unix.so use_first_pass
+
+
+vi /etc/pam.d/common-session
+
+session required        pam_mkhomedir.so skel=/etc/skel/ umask=0022
+
+getent passwd tacacs 
